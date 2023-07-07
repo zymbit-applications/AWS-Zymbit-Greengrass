@@ -43,29 +43,6 @@ sudo $INSTALLER install -y $INSTALLER_SPECIFIC_PACKAGES
 
 sudo pip3 install awscli
 
-# NOTE: -c operator checks if a file is a character device, -f checks for regular files and will not work here
-if [ ! -c /dev/i2c-1 ]; then
-  echo "I2C not enabled, enabling..."
-
-  # Add i2c-dev to the list of modules to load at boot time if it isn't there already
-  if ! sudo grep -q "^i2c[-_]dev" /etc/modules; then
-    sudo bash -c "printf \"i2c-dev\n\" >> /etc/modules"
-  fi
-
-  # Force i2c on in /boot/config.txt
-  sudo sed -i 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/' /boot/config.txt
-
-  # Force i2c on with dtparam
-  sudo dtparam i2c_arm=on
-
-  # Load i2c module
-  sudo modprobe i2c_dev
-
-  if [ ! -c /dev/i2c-1 ]; then
-    error "Failed to enable I2C, enable it manually with raspi-config and try again"
-  fi
-fi
-
 hash zk_pkcs11-util &>/dev/null
 
 if [ $? -ne 0 ]; then
@@ -74,7 +51,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Make sure the user is added to the necessary group so they can use the tools later without being root
-sudo usermod -a -G zk_pkcs11 pi
+sudo usermod -a -G zk_pkcs11 $USER
 
 hash pkcs11-tool &>/dev/null
 
@@ -97,7 +74,7 @@ if [ $? -ne 0 ]; then
     error "Failed to initialize token with zk_pkcs11-util"
   fi
 
-  sudo zk_pkcs11-util --use-zkslot 0 --slot $SLOT_NUMBER --label iotkey --id 0000 --pin 1234
+  sudo zk_pkcs11-util --use-zkslot 0 --slot $SLOT_NUMBER --label iotkey --id $SLOT_NUMBER --pin 1234
 else
   echo "Keys already exist, skipping token initialization and private key creation"
 fi
