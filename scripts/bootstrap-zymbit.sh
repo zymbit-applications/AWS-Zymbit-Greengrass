@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
+# set -x
 
 CSR=zymbit.csr
 LIBZKPKCS11_SO_NAME="libzk_pkcs11.so"

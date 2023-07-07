@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
+# set -x
 
 CERTIFICATE_ARN_FILE=certificate.arn
 CERTIFICATE_ID_FILE=certificate.id
